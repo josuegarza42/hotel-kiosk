@@ -357,20 +357,15 @@ function showError(message) {
 // ==========================================
 
 function generateSessionId() {
-    return 'SESSION-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    // Usar session ID fijo para demo/pruebas
+    return 'DEMO-SESSION-001';
 }
 
 async function startKioskSession() {
     currentSessionId = generateSessionId();
 
-    // Generar QR con datos de la sesion
-    const qrData = JSON.stringify({
-        sessionId: currentSessionId,
-        hotelId: KIOSK_CONFIG.hotelId,
-        hotelName: KIOSK_CONFIG.hotelName,
-        kioskId: KIOSK_CONFIG.kioskId,
-        timestamp: Date.now()
-    });
+    // URL de la guest app con parametros de sesion
+    const guestAppUrl = `${window.location.origin}/public/guest-app.html?session=${currentSessionId}&hotel=${KIOSK_CONFIG.hotelId}&hotelName=${encodeURIComponent(KIOSK_CONFIG.hotelName)}&kiosk=${KIOSK_CONFIG.kioskId}`;
 
     // Mostrar QR
     const qrContainer = document.getElementById('kiosk-qr');
@@ -379,7 +374,7 @@ async function startKioskSession() {
     // Usar QRCode library para generar el QR
     if (typeof QRCode !== 'undefined') {
         new QRCode(qrContainer, {
-            text: qrData,
+            text: guestAppUrl,
             width: 240,
             height: 240,
             colorDark: '#1a1a2e',
@@ -400,6 +395,7 @@ async function startKioskSession() {
     startSessionPolling();
 
     console.log('Kiosk session started:', currentSessionId);
+    console.log('Guest app URL:', guestAppUrl);
 }
 
 function stopKioskSession() {

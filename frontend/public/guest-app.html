@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Check-in</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #1a1a2e;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .hotel-badge {
+            background: #4a90d9;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a90d9;
+        }
+
+        .form-group input::placeholder {
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(74, 144, 217, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.loading {
+            display: block;
+            background: #e7f1ff;
+            color: #004085;
+        }
+
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-screen {
+            text-align: center;
+        }
+
+        .success-screen h2 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .success-screen p {
+            color: #666;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .info-box p {
+            margin-bottom: 5px;
+        }
+
+        .session-info {
+            font-size: 0.75rem;
+            color: #999;
+            text-align: center;
+            margin-top: 15px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Form -->
+        <div id="form-screen">
+            <div class="logo">
+                <h1>Hotel Check-in</h1>
+                <p>Quick & Easy</p>
+            </div>
+
+            <div style="text-align: center;">
+                <span class="hotel-badge" id="hotel-name">Connecting...</span>
+            </div>
+
+            <div class="form-group">
+                <label>Confirmation Code</label>
+                <input type="text" id="confirmation-code" placeholder="RES-XXXXXXXX" maxlength="12">
+            </div>
+
+            <button class="btn" id="link-btn" onclick="linkReservation()">
+                Connect to Kiosk
+            </button>
+
+            <div id="status" class="status"></div>
+
+            <div class="info-box">
+                <p>📱 Enter your reservation code</p>
+                <p>🔗 Your info will appear on the kiosk</p>
+                <p>✅ Confirm check-in on the kiosk screen</p>
+            </div>
+
+            <div class="session-info" id="session-info"></div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="success-screen hidden">
+            <div class="success-icon">✅</div>
+            <h2>Connected!</h2>
+            <p>Your reservation is now on the kiosk.</p>
+            <p style="margin-top: 20px; font-weight: 600;">Please complete check-in on the kiosk screen.</p>
+
+            <div class="info-box" id="reservation-info"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api/v1';
+        let sessionData = null;
+
+        // Obtener parametros de la URL (del QR)
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                sessionId: params.get('session'),
+                hotelId: params.get('hotel'),
+                hotelName: params.get('hotelName'),
+                kioskId: params.get('kiosk')
+            };
+        }
+
+        // Intentar parsear datos del QR desde la URL
+        function parseQRData() {
+            const params = getUrlParams();
+
+            if (params.sessionId) {
+                sessionData = {
+                    sessionId: params.sessionId,
+                    hotelId: params.hotelId,
+                    hotelName: params.hotelName || 'Hotel',
+                    kioskId: params.kioskId
+                };
+            } else {
+                // Intentar obtener de hash o query string como JSON
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    try {
+                        sessionData = JSON.parse(decodeURIComponent(hash));
+                    } catch (e) {
+                        console.log('Could not parse hash data');
+                    }
+                }
+            }
+
+            if (sessionData) {
+                document.getElementById('hotel-name').textContent = sessionData.hotelName || 'Hotel';
+                document.getElementById('session-info').textContent = `Session: ${sessionData.sessionId}`;
+            } else {
+                document.getElementById('hotel-name').textContent = 'Demo Mode';
+                document.getElementById('session-info').textContent = 'No session - Enter session ID manually or scan QR from kiosk';
+
+                // Agregar campo para session ID manual
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                formGroup.innerHTML = `
+                    <label>Session ID (from kiosk)</label>
+                    <input type="text" id="manual-session" placeholder="SESSION-XXXXX">
+                `;
+                document.querySelector('.form-group').before(formGroup);
+            }
+        }
+
+        async function linkReservation() {
+            const code = document.getElementById('confirmation-code').value.trim().toUpperCase();
+            const manualSessionInput = document.getElementById('manual-session');
+            const manualSession = manualSessionInput ? manualSessionInput.value.trim() : null;
+
+            const sessionId = sessionData?.sessionId || manualSession;
+
+            if (!sessionId) {
+                showStatus('Please scan the QR from the kiosk or enter Session ID', 'error');
+                return;
+            }
+
+            if (!code) {
+                showStatus('Please enter your confirmation code', 'error');
+                return;
+            }
+
+            showStatus('Connecting...', 'loading');
+            document.getElementById('link-btn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/kiosk-sessions/${sessionId}/link`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        confirmation_code: code
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Error connecting');
+                }
+
+                // Exito
+                showSuccessScreen(data.session.reservation);
+
+            } catch (error) {
+                showStatus(error.message, 'error');
+                document.getElementById('link-btn').disabled = false;
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function showSuccessScreen(reservation) {
+            document.getElementById('form-screen').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+
+            document.getElementById('reservation-info').innerHTML = `
+                <p><strong>Guest:</strong> ${reservation.guest_name}</p>
+                <p><strong>Room:</strong> ${reservation.room_number}</p>
+                <p><strong>Check-in:</strong> ${reservation.check_in_date}</p>
+                <p><strong>Check-out:</strong> ${reservation.check_out_date}</p>
+            `;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', parseQRData);
+    </script>
+</body>
+</html>

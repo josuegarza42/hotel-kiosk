@@ -41,8 +41,15 @@ def create_session(hotel_id: int, kiosk_id: str):
 @router.get("/{session_id}")
 def get_session(session_id: str):
     """Verificar estado de una sesion"""
+    # Crear sesion automaticamente si no existe (para demo)
     if session_id not in active_sessions:
-        raise HTTPException(status_code=404, detail="Session not found")
+        active_sessions[session_id] = {
+            "session_id": session_id,
+            "hotel_id": 1,
+            "kiosk_id": "KIOSK-001",
+            "reservation": None,
+            "created_at": datetime.now()
+        }
 
     session = active_sessions[session_id]
 
@@ -60,8 +67,15 @@ def link_reservation(session_id: str, request: LinkReservationRequest, db = None
     from app.core.database import SessionLocal
     from app.models.reservation import Reservation
 
+    # Crear sesion automaticamente si no existe
     if session_id not in active_sessions:
-        raise HTTPException(status_code=404, detail="Session not found or expired")
+        active_sessions[session_id] = {
+            "session_id": session_id,
+            "hotel_id": 1,
+            "kiosk_id": "KIOSK-001",
+            "reservation": None,
+            "created_at": datetime.now()
+        }
 
     db = SessionLocal()
 

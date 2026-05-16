@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, hotels, rooms, reservations, check_in, guests, users, kiosks
+from app.api.v1.endpoints import auth, hotels, rooms, reservations, check_in, guests, users, kiosks, kiosk_sessions
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(check_in.router, prefix="/check-in", tags=["Check-in/C
 api_router.include_router(guests.router, prefix="/guests", tags=["Huéspedes"])
 api_router.include_router(users.router, prefix="/users", tags=["Usuarios"])
 api_router.include_router(kiosks.router, prefix="/kiosks", tags=["Kioscos"])
+api_router.include_router(kiosk_sessions.router, prefix="/kiosk-sessions", tags=["Kiosk Sessions"])

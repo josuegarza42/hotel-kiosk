@@ -60,7 +60,32 @@ const api = {
         const response = await fetch(`${API_BASE_URL}/reservations/room/${roomNumber}/active`);
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.detail || 'Habitacion no encontrada');
+            throw new Error(error.detail || 'Habitacion no encontrada o sin huesped');
+        }
+        return response.json();
+    },
+
+    async checkSession(sessionId) {
+        const response = await fetch(`${API_BASE_URL}/kiosk-sessions/${sessionId}`);
+        if (!response.ok) {
+            throw new Error('Session not found or no reservation linked');
+        }
+        return response.json();
+    },
+
+    async linkReservationToSession(sessionId, reservationCode) {
+        const response = await fetch(`${API_BASE_URL}/kiosk-sessions/${sessionId}/link`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                confirmation_code: reservationCode
+            })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Error linking reservation');
         }
         return response.json();
     },

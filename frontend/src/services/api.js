@@ -56,6 +56,15 @@ const api = {
         return response.json();
     },
 
+    async getActiveReservationByRoom(roomNumber) {
+        const response = await fetch(`${API_BASE_URL}/reservations/room/${roomNumber}/active`);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Habitacion no encontrada');
+        }
+        return response.json();
+    },
+
     async kioskHeartbeat(kioskId) {
         const response = await fetch(`${API_BASE_URL}/kiosks/${kioskId}/heartbeat`, {
             method: 'POST'

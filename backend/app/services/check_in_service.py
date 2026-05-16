@@ -1,9 +1,13 @@
 import uuid
+import logging
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.reservation import Reservation, ReservationStatus
 from app.models.check_in import CheckIn
 from app.models.room import Room, RoomStatus
+from app.services.email_service import EmailService
+
+logger = logging.getLogger(__name__)
 
 
 class CheckInService:
@@ -59,6 +63,24 @@ class CheckInService:
         db.commit()
         db.refresh(check_in)
 
+        # Send check-in confirmation email (non-blocking)
+        try:
+            guest = reservation.guest
+            if guest.email:
+                EmailService.send_check_in_confirmation(
+                    guest_email=guest.email,
+                    guest_name=f"{guest.first_name} {guest.last_name}",
+                    hotel_name=reservation.hotel.name,
+                    room_number=reservation.room.room_number,
+                    digital_key_code=check_in.digital_key_code,
+                    wristband_code=check_in.wristband_code,
+                    check_in_date=reservation.check_in_date,
+                    check_out_date=reservation.check_out_date
+                )
+        except Exception as e:
+            # Email failure should not block check-in process
+            logger.error(f"Failed to send check-in confirmation email: {str(e)}")
+
         return {
             "check_in": check_in,
             "reservation": reservation,
@@ -96,6 +118,32 @@ class CheckInService:
         reservation.room.status = RoomStatus.CLEANING
 
         db.commit()
+
+        # Send check-out confirmation email (non-blocking)
+        try:
+            guest = reservation.guest
+            if guest.email:
+                # Calculate total nights
+                check_in_date = reservation.check_in_date
+                check_out_date = reservation.check_out_date
+                if hasattr(check_in_date, 'date'):
+                    check_in_date = check_in_date.date() if callable(getattr(check_in_date, 'date', None)) else check_in_date
+                if hasattr(check_out_date, 'date'):
+                    check_out_date = check_out_date.date() if callable(getattr(check_out_date, 'date', None)) else check_out_date
+                total_nights = (check_out_date - check_in_date).days
+
+                EmailService.send_check_out_confirmation(
+                    guest_email=guest.email,
+                    guest_name=f"{guest.first_name} {guest.last_name}",
+                    hotel_name=reservation.hotel.name,
+                    room_number=reservation.room.room_number,
+                    check_in_date=reservation.check_in_date,
+                    check_out_date=reservation.check_out_date,
+                    total_nights=max(total_nights, 1)
+                )
+        except Exception as e:
+            # Email failure should not block check-out process
+            logger.error(f"Failed to send check-out confirmation email: {str(e)}")
 
         return {
             "reservation": reservation,

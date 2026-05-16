@@ -117,6 +117,42 @@ def get_reservation_by_code(
     )
 
 
+@router.get("/room/{room_number}/active")
+def get_active_reservation_by_room(
+    room_number: str,
+    db: Session = Depends(get_db)
+):
+    """Get the active (checked-in) reservation for a room number - used for checkout"""
+    room = db.query(Room).filter(Room.room_number == room_number).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Habitación no encontrada")
+
+    reservation = db.query(Reservation).filter(
+        Reservation.room_id == room.id,
+        Reservation.status == "checked_in"
+    ).first()
+
+    if not reservation:
+        raise HTTPException(status_code=404, detail="No hay huésped registrado en esta habitación")
+
+    guest = reservation.guest
+    nights = (reservation.check_out_date - reservation.check_in_date).days
+
+    return {
+        "reservation_id": reservation.id,
+        "confirmation_code": reservation.confirmation_code,
+        "guest_name": f"{guest.first_name} {guest.last_name}",
+        "room_number": room.room_number,
+        "check_in_date": reservation.check_in_date,
+        "check_out_date": reservation.check_out_date,
+        "nights": nights,
+        "total_amount": float(reservation.total_amount) if reservation.total_amount else 0,
+        "amount_paid": float(reservation.amount_paid) if reservation.amount_paid else 0,
+        "pending_amount": float(reservation.total_amount - reservation.amount_paid) if reservation.total_amount else 0,
+        "hotel_name": reservation.hotel.name
+    }
+
+
 @router.put("/{reservation_id}", response_model=ReservationResponse)
 def update_reservation(
     reservation_id: int,

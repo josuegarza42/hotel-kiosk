@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_EMAIL: str = "admin@hotelkiosk.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin123"
 
+    # Email/SMTP Configuration
+    SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_USE_TLS: bool = True
+    EMAIL_FROM_NAME: str = "Hotel Kiosk"
+    EMAIL_FROM_ADDRESS: Optional[str] = None
+
     class Config:
         env_file = ".env"
         case_sensitive = True

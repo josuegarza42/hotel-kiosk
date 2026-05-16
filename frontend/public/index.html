@@ -2,172 +2,784 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Kiosk - Check-in Automatizado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hotel Kiosk - Check-in</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/styles/kiosk.css">
 </head>
 <body>
     <div id="app">
+        <!-- Header Global -->
+        <header class="global-header">
+            <div class="hotel-brand">
+                <div class="hotel-logo" id="hotel-logo"></div>
+                <span class="hotel-name" id="header-hotel-name">Hotel</span>
+            </div>
+            <div class="header-right">
+                <div class="current-time" id="current-time">--:--</div>
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="es">ES</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="zh">ZH</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span data-i18n="step_identify">Identificarse</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <span data-i18n="step_confirm">Confirmar</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">
+                <div class="step-circle">3</div>
+                <span data-i18n="step_done">Listo</span>
+            </div>
+        </div>
+
         <!-- Pantalla de Bienvenida -->
         <div id="welcome-screen" class="screen active">
-            <div class="logo">
-                <h1>Bienvenido</h1>
-                <p>Sistema de Check-in Automatizado</p>
-            </div>
-            <div class="welcome-content">
-                <div class="qr-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
+            <div class="screen-content welcome-layout">
+                <div class="welcome-hero">
+                    <div class="welcome-animation">
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring delay-1"></div>
+                        <div class="pulse-ring delay-2"></div>
+                        <svg class="welcome-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="3"/>
+                            <rect x="48" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="3"/>
+                            <rect x="8" y="48" width="24" height="24" rx="4" stroke="currentColor" stroke-width="3"/>
+                            <rect x="52" y="52" width="16" height="16" rx="2" fill="currentColor"/>
+                            <rect x="48" y="48" width="6" height="6" rx="1" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h1 class="welcome-title" data-i18n="welcome_title">Bienvenido</h1>
+                    <p class="welcome-subtitle" data-i18n="welcome_subtitle">Realiza tu check-in en segundos</p>
                 </div>
-                <h2>Escanea tu codigo QR</h2>
-                <p>Presenta el codigo QR de tu reservacion frente a la camara</p>
-                <button class="btn btn-primary btn-large" onclick="showScreen('scan-screen')">
-                    Iniciar Check-in
-                </button>
-                <button class="btn btn-secondary" onclick="showScreen('manual-screen')">
-                    Ingresar codigo manualmente
-                </button>
-            </div>
-            <div class="language-selector">
-                <button class="lang-btn active">ES</button>
-                <button class="lang-btn">EN</button>
+
+                <div class="welcome-options">
+                    <button class="option-card primary" onclick="showScreen('scan-screen')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                        </div>
+                        <div class="option-text">
+                            <span class="option-title" data-i18n="scan_qr">Escanear QR</span>
+                            <span class="option-desc" data-i18n="scan_qr_desc">Usa la camara para escanear tu codigo</span>
+                        </div>
+                        <div class="option-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button class="option-card" onclick="showScreen('manual-screen')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="9" y1="9" x2="15" y2="9"/>
+                                <line x1="9" y1="13" x2="15" y2="13"/>
+                                <line x1="9" y1="17" x2="11" y2="17"/>
+                            </svg>
+                        </div>
+                        <div class="option-text">
+                            <span class="option-title" data-i18n="manual_code">Ingresar codigo</span>
+                            <span class="option-desc" data-i18n="manual_code_desc">Escribe tu codigo de confirmacion</span>
+                        </div>
+                        <div class="option-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button class="option-card checkout-card" onclick="showScreen('checkout-room-screen')">
+                        <div class="option-icon checkout-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                        </div>
+                        <div class="option-text">
+                            <span class="option-title" data-i18n="checkout">Check-out</span>
+                            <span class="option-desc" data-i18n="checkout_desc">Completa tu proceso de salida</span>
+                        </div>
+                        <div class="option-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="welcome-footer">
+                    <p data-i18n="need_help">¿Necesitas ayuda? Presiona el boton de asistencia</p>
+                    <button class="help-btn" onclick="requestHelp()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <span data-i18n="assistance">Asistencia</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Pantalla de Escaneo QR -->
         <div id="scan-screen" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
-                <h2>Escanear QR</h2>
-            </div>
-            <div class="scan-content">
-                <div id="qr-reader"></div>
-                <p>Coloca el codigo QR frente a la camara</p>
-                <div id="scan-status" class="status"></div>
+            <div class="screen-content">
+                <button class="back-button" onclick="showScreen('welcome-screen')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span data-i18n="back">Volver</span>
+                </button>
+
+                <div class="scan-container">
+                    <h2 class="screen-title" data-i18n="scan_title">Escanea tu codigo QR</h2>
+                    <p class="screen-subtitle" data-i18n="scan_subtitle">Posiciona el codigo dentro del marco</p>
+
+                    <div class="qr-scanner-wrapper">
+                        <div class="scanner-frame">
+                            <div class="corner top-left"></div>
+                            <div class="corner top-right"></div>
+                            <div class="corner bottom-left"></div>
+                            <div class="corner bottom-right"></div>
+                            <div class="scan-line"></div>
+                        </div>
+                        <div id="qr-reader"></div>
+                    </div>
+
+                    <div id="scan-status" class="scan-status"></div>
+
+                    <button class="text-link" onclick="showScreen('manual-screen')">
+                        <span data-i18n="cant_scan">¿No puedes escanear? Ingresa el codigo manualmente</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Pantalla de Ingreso Manual -->
         <div id="manual-screen" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
-                <h2>Ingreso Manual</h2>
-            </div>
-            <div class="manual-content">
-                <div class="form-group">
-                    <label for="confirmation-code">Codigo de Confirmacion</label>
-                    <input type="text" id="confirmation-code" placeholder="RES-XXXXXXXX" class="input-large">
-                </div>
-                <button class="btn btn-primary btn-large" onclick="searchByCode()">
-                    Buscar Reservacion
+            <div class="screen-content">
+                <button class="back-button" onclick="showScreen('welcome-screen')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span data-i18n="back">Volver</span>
                 </button>
-                <div id="manual-status" class="status"></div>
+
+                <div class="manual-container">
+                    <h2 class="screen-title" data-i18n="enter_code">Ingresa tu codigo</h2>
+                    <p class="screen-subtitle" data-i18n="enter_code_desc">Escribe el codigo de confirmacion de tu reservacion</p>
+
+                    <div class="code-input-wrapper">
+                        <div class="code-prefix">RES-</div>
+                        <input type="text"
+                               id="confirmation-code"
+                               class="code-input"
+                               maxlength="8"
+                               placeholder="XXXXXXXX"
+                               autocomplete="off"
+                               inputmode="none">
+                    </div>
+
+                    <div id="manual-status" class="input-status"></div>
+
+                    <!-- Teclado Virtual -->
+                    <div class="virtual-keyboard">
+                        <div class="keyboard-row">
+                            <button class="key" data-key="1">1</button>
+                            <button class="key" data-key="2">2</button>
+                            <button class="key" data-key="3">3</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key" data-key="4">4</button>
+                            <button class="key" data-key="5">5</button>
+                            <button class="key" data-key="6">6</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key" data-key="7">7</button>
+                            <button class="key" data-key="8">8</button>
+                            <button class="key" data-key="9">9</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key letter" data-key="A">A</button>
+                            <button class="key" data-key="0">0</button>
+                            <button class="key letter" data-key="B">B</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key letter" data-key="C">C</button>
+                            <button class="key letter" data-key="D">D</button>
+                            <button class="key letter" data-key="E">E</button>
+                            <button class="key letter" data-key="F">F</button>
+                        </div>
+                        <div class="keyboard-row actions">
+                            <button class="key action delete" onclick="deleteChar()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                                    <line x1="18" y1="9" x2="12" y2="15"/>
+                                    <line x1="12" y1="9" x2="18" y2="15"/>
+                                </svg>
+                            </button>
+                            <button class="key action clear" onclick="clearCode()">
+                                <span data-i18n="clear">Borrar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" onclick="searchByCode()" id="search-btn">
+                        <span data-i18n="search_reservation">Buscar reservacion</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Pantalla de Confirmacion de Datos -->
+        <!-- Pantalla de Confirmacion -->
         <div id="confirm-screen" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
-                <h2>Confirmar Datos</h2>
-            </div>
-            <div class="confirm-content">
-                <div class="reservation-card">
-                    <div class="guest-info">
-                        <h3 id="guest-name">-</h3>
-                        <p id="confirmation-display">Codigo: -</p>
-                    </div>
-                    <div class="reservation-details">
-                        <div class="detail-item">
-                            <span class="label">Hotel</span>
-                            <span id="hotel-name" class="value">-</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Habitacion</span>
-                            <span id="room-number" class="value">-</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Check-in</span>
-                            <span id="check-in-date" class="value">-</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Check-out</span>
-                            <span id="check-out-date" class="value">-</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="terms-section">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="terms-checkbox">
-                        <span class="checkmark"></span>
-                        Acepto los terminos y condiciones del hotel
-                    </label>
-                </div>
-                <button class="btn btn-primary btn-large" onclick="processCheckIn()" id="checkin-btn" disabled>
-                    Confirmar Check-in
+            <div class="screen-content">
+                <button class="back-button" onclick="showScreen('welcome-screen')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span data-i18n="back">Volver</span>
                 </button>
+
+                <div class="confirm-container">
+                    <h2 class="screen-title" data-i18n="confirm_details">Confirma tus datos</h2>
+
+                    <div class="reservation-card-modern">
+                        <div class="card-header">
+                            <div class="guest-avatar" id="guest-initials">JD</div>
+                            <div class="guest-details">
+                                <h3 id="guest-name">Juan Perez</h3>
+                                <span class="confirmation-badge" id="confirmation-display">RES-ABC123</span>
+                            </div>
+                        </div>
+
+                        <div class="card-divider"></div>
+
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                            <polyline points="9 22 9 12 15 12 15 22"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="room">Habitacion</span>
+                                        <span class="info-value" id="room-number">101</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="check_in">Entrada</span>
+                                        <span class="info-value" id="check-in-date">15 May</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                            <path d="M8 14l2 2 4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="check_out">Salida</span>
+                                        <span class="info-value" id="check-out-date">18 May</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                            <circle cx="9" cy="7" r="4"/>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="guests">Huespedes</span>
+                                        <span class="info-value" id="num-guests">2</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="hotel-info">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
+                                    <path d="M1 21h22"/>
+                                    <path d="M9 7h1m4 0h1m-6 4h1m4 0h1m-6 4h1"/>
+                                </svg>
+                                <span id="hotel-name">Hotel Plaza Centro</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-container">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="terms-checkbox">
+                            <span class="checkbox-mark">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </span>
+                            <span class="checkbox-label" data-i18n="accept_terms">Acepto los terminos y condiciones del hotel</span>
+                        </label>
+                        <button class="terms-link" onclick="showTerms()" data-i18n="read_terms">Leer terminos</button>
+                    </div>
+
+                    <button class="btn-primary" onclick="processCheckIn()" id="checkin-btn" disabled>
+                        <span data-i18n="confirm_checkin">Confirmar Check-in</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Pantalla de Exito -->
         <div id="success-screen" class="screen">
-            <div class="success-content">
-                <div class="success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
+            <div class="screen-content success-layout">
+                <div class="success-animation">
+                    <div class="success-circle">
+                        <svg class="checkmark" viewBox="0 0 52 52">
+                            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                    </div>
                 </div>
-                <h2>Check-in Exitoso</h2>
-                <div class="key-info">
-                    <p>Tu llave digital:</p>
-                    <div class="key-code" id="digital-key">-</div>
+
+                <h2 class="success-title" data-i18n="checkin_success">Check-in completado</h2>
+                <p class="success-subtitle" data-i18n="enjoy_stay">Disfruta tu estancia</p>
+
+                <div class="credentials-container">
+                    <div class="credential-card room-card">
+                        <div class="credential-label" data-i18n="your_room">Tu habitacion</div>
+                        <div class="credential-value room-value" id="assigned-room">101</div>
+                        <div class="credential-sublabel" id="room-floor">Piso 1</div>
+                    </div>
+
+                    <div class="credential-card key-card">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                            </svg>
+                        </div>
+                        <div class="credential-label" data-i18n="digital_key">Llave digital</div>
+                        <div class="credential-value key-value" id="digital-key">KEY-XXXX</div>
+                    </div>
+
+                    <div class="credential-card wristband-card">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 12h8M12 8v8"/>
+                            </svg>
+                        </div>
+                        <div class="credential-label" data-i18n="wristband">Pulsera</div>
+                        <div class="credential-value wristband-value" id="wristband-code">WB-XXXX</div>
+                    </div>
                 </div>
-                <div class="room-info-large">
-                    <p>Habitacion</p>
-                    <div class="room-number-large" id="assigned-room">-</div>
+
+                <div class="success-instructions">
+                    <div class="instruction-item">
+                        <div class="instruction-number">1</div>
+                        <span data-i18n="instruction_1">Dirígete a los elevadores del lobby</span>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">2</div>
+                        <span data-i18n="instruction_2">Usa tu llave digital en la puerta</span>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">3</div>
+                        <span data-i18n="instruction_3">La pulsera te da acceso a amenidades</span>
+                    </div>
                 </div>
-                <div class="wristband-info">
-                    <p>Codigo de pulsera:</p>
-                    <div class="wristband-code" id="wristband-code">-</div>
-                </div>
-                <p class="instructions">Presenta este codigo en la entrada de tu habitacion</p>
-                <button class="btn btn-primary btn-large" onclick="finishAndReset()">
-                    Finalizar
+
+                <button class="btn-primary" onclick="finishAndReset()">
+                    <span data-i18n="finish">Finalizar</span>
                 </button>
+
+                <p class="auto-close-notice" data-i18n="auto_close">Esta pantalla se cerrará automáticamente en <span id="countdown">30</span> segundos</p>
+            </div>
+        </div>
+
+        <!-- Pantalla de Check-out - Ingresar Habitacion -->
+        <div id="checkout-room-screen" class="screen">
+            <div class="screen-content">
+                <button class="back-button" onclick="showScreen('welcome-screen')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span data-i18n="back">Volver</span>
+                </button>
+
+                <div class="manual-container">
+                    <h2 class="screen-title" data-i18n="checkout_title">Ingresa tu numero de habitacion</h2>
+                    <p class="screen-subtitle" data-i18n="checkout_subtitle">Escribe el numero de tu habitacion para iniciar el checkout</p>
+
+                    <div class="code-input-wrapper room-input-wrapper">
+                        <div class="code-prefix room-prefix">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                        </div>
+                        <input type="text"
+                               id="checkout-room-input"
+                               class="code-input"
+                               maxlength="4"
+                               placeholder="000"
+                               autocomplete="off"
+                               inputmode="none">
+                    </div>
+
+                    <div id="checkout-status" class="input-status"></div>
+
+                    <!-- Teclado Virtual Numerico -->
+                    <div class="virtual-keyboard">
+                        <div class="keyboard-row">
+                            <button class="key" data-key="1">1</button>
+                            <button class="key" data-key="2">2</button>
+                            <button class="key" data-key="3">3</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key" data-key="4">4</button>
+                            <button class="key" data-key="5">5</button>
+                            <button class="key" data-key="6">6</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key" data-key="7">7</button>
+                            <button class="key" data-key="8">8</button>
+                            <button class="key" data-key="9">9</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key action delete" onclick="deleteCheckoutChar()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                                    <line x1="18" y1="9" x2="12" y2="15"/>
+                                    <line x1="12" y1="9" x2="18" y2="15"/>
+                                </svg>
+                            </button>
+                            <button class="key" data-key="0">0</button>
+                            <button class="key action clear" onclick="clearCheckoutRoom()">
+                                <span data-i18n="clear">Borrar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary btn-checkout" onclick="searchRoomForCheckout()" id="search-room-btn">
+                        <span data-i18n="search_room">Buscar habitacion</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Confirmacion de Check-out -->
+        <div id="checkout-confirm-screen" class="screen">
+            <div class="screen-content">
+                <button class="back-button" onclick="showScreen('checkout-room-screen')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span data-i18n="back">Volver</span>
+                </button>
+
+                <div class="confirm-container">
+                    <h2 class="screen-title" data-i18n="checkout_confirm_title">Confirma tu check-out</h2>
+
+                    <div class="reservation-card-modern checkout-card-modern">
+                        <div class="card-header">
+                            <div class="guest-avatar checkout-avatar" id="checkout-guest-initials">JD</div>
+                            <div class="guest-details">
+                                <h3 id="checkout-guest-name">Juan Perez</h3>
+                                <span class="room-badge" id="checkout-room-number">101</span>
+                            </div>
+                        </div>
+
+                        <div class="card-divider"></div>
+
+                        <div class="card-body">
+                            <h4 class="summary-title" data-i18n="stay_summary">Resumen de estancia</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="check_in">Entrada</span>
+                                        <span class="info-value" id="checkout-checkin-date">15 May</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                            <path d="M8 14l2 2 4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-i18n="check_out">Salida</span>
+                                        <span class="info-value" id="checkout-checkout-date">18 May</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-item full-width">
+                                    <div class="info-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 6v6l4 2"/>
+                                        </svg>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Noches</span>
+                                        <span class="info-value" id="checkout-nights">3</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="charges-section">
+                                <h4 class="charges-title" data-i18n="pending_charges">Cargos pendientes</h4>
+                                <div class="charges-list" id="checkout-charges">
+                                    <p class="no-charges" data-i18n="no_pending_charges">Sin cargos pendientes</p>
+                                </div>
+                                <div class="charges-total">
+                                    <span data-i18n="total_to_pay">Total a pagar</span>
+                                    <span class="total-amount" id="checkout-total">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="hotel-info">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
+                                    <path d="M1 21h22"/>
+                                    <path d="M9 7h1m4 0h1m-6 4h1m4 0h1m-6 4h1"/>
+                                </svg>
+                                <span id="checkout-hotel-name">Hotel Plaza Centro</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary btn-checkout-confirm" onclick="processCheckOut()" id="checkout-btn">
+                        <span data-i18n="confirm_checkout">Confirmar Check-out</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Exito de Check-out -->
+        <div id="checkout-success-screen" class="screen">
+            <div class="screen-content success-layout checkout-success-layout">
+                <div class="success-animation">
+                    <div class="success-circle checkout-success-circle">
+                        <svg class="checkmark" viewBox="0 0 52 52">
+                            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <h2 class="success-title checkout-success-title" data-i18n="checkout_success">Check-out completado!</h2>
+                <p class="success-subtitle" data-i18n="thank_you_stay">Gracias por tu estancia</p>
+
+                <div class="farewell-container">
+                    <div class="farewell-card">
+                        <div class="farewell-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                        <p class="farewell-message" data-i18n="farewell_message">Esperamos verte de nuevo pronto</p>
+                        <div class="farewell-details">
+                            <span class="farewell-guest" id="checkout-success-guest">Juan Perez</span>
+                            <span class="farewell-room">Hab. <span id="checkout-success-room">101</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-instructions checkout-instructions">
+                    <div class="instruction-item">
+                        <div class="instruction-number">1</div>
+                        <span data-i18n="checkout_instruction_1">Por favor deja la tarjeta llave en la habitacion</span>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">2</div>
+                        <span data-i18n="checkout_instruction_2">Revisa tu correo para el recibo</span>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">3</div>
+                        <span data-i18n="checkout_instruction_3">Buen viaje!</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="finishAndReset()">
+                    <span data-i18n="finish">Finalizar</span>
+                </button>
+
+                <p class="auto-close-notice" data-i18n="auto_close">Esta pantalla se cerrara automaticamente en <span id="checkout-countdown">30</span> segundos</p>
             </div>
         </div>
 
         <!-- Pantalla de Error -->
         <div id="error-screen" class="screen">
-            <div class="error-content">
-                <div class="error-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#f44336" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                    </svg>
+            <div class="screen-content error-layout">
+                <div class="error-animation">
+                    <div class="error-circle">
+                        <svg viewBox="0 0 52 52">
+                            <circle cx="26" cy="26" r="25" fill="none" stroke="#ef4444" stroke-width="2"/>
+                            <path stroke="#ef4444" stroke-width="3" fill="none" d="M16 16l20 20M36 16L16 36"/>
+                        </svg>
+                    </div>
                 </div>
-                <h2>Error</h2>
-                <p id="error-message">Ha ocurrido un error</p>
-                <button class="btn btn-primary btn-large" onclick="showScreen('welcome-screen')">
-                    Intentar de nuevo
-                </button>
+
+                <h2 class="error-title" data-i18n="error_title">Ocurrio un problema</h2>
+                <p class="error-message" id="error-message">No pudimos procesar tu solicitud</p>
+
+                <div class="error-suggestions">
+                    <p data-i18n="try_following">Intenta lo siguiente:</p>
+                    <ul>
+                        <li data-i18n="error_tip_1">Verifica que tu codigo sea correcto</li>
+                        <li data-i18n="error_tip_2">Asegurate que la fecha de check-in sea hoy</li>
+                        <li data-i18n="error_tip_3">Contacta a recepcion si el problema persiste</li>
+                    </ul>
+                </div>
+
+                <div class="error-actions">
+                    <button class="btn-primary" onclick="showScreen('welcome-screen')">
+                        <span data-i18n="try_again">Intentar de nuevo</span>
+                    </button>
+                    <button class="btn-secondary" onclick="requestHelp()">
+                        <span data-i18n="call_assistance">Llamar asistencia</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Loading Overlay -->
         <div id="loading-overlay" class="overlay hidden">
-            <div class="loader"></div>
-            <p>Procesando...</p>
+            <div class="loading-content">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                </div>
+                <p class="loading-text" data-i18n="processing">Procesando...</p>
+            </div>
+        </div>
+
+        <!-- Terms Modal -->
+        <div id="terms-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-i18n="terms_title">Terminos y Condiciones</h3>
+                    <button class="modal-close" onclick="hideTerms()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Al realizar el check-in, acepta las siguientes condiciones:</p>
+                    <ul>
+                        <li>El horario de check-out es a las 12:00 PM</li>
+                        <li>No se permite fumar en las habitaciones</li>
+                        <li>Las mascotas requieren autorizacion previa</li>
+                        <li>El huesped es responsable de los danos a la habitacion</li>
+                        <li>Los objetos de valor deben guardarse en la caja fuerte</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="hideTerms()">
+                        <span data-i18n="understood">Entendido</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-i18n="assistance">Asistencia</h3>
+                    <button class="modal-close" onclick="hideHelp()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body help-body">
+                    <div class="help-icon-large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                    </div>
+                    <p data-i18n="help_message">Un miembro de nuestro equipo viene en camino para ayudarte.</p>
+                    <p class="help-wait" data-i18n="please_wait">Por favor espera en este kiosko.</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="../src/services/api.js"></script>
     <script src="../src/components/kiosk.js"></script>
 </body>

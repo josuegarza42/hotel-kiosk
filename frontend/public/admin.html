@@ -191,18 +191,28 @@
 
                     <!-- Kiosko Modal -->
                     <div id="kiosk-modal" class="modal" style="display:none;">
-                        <div class="modal-content" style="max-width:400px;">
-                            <span class="close" id="close-kiosk-modal">&times;</span>
-                            <h3>Nuevo Kiosko</h3>
-                            <form id="kiosk-modal-form">
-                                <input type="text" id="modal-kiosk-name" placeholder="Nombre" required style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
-                                <input type="text" id="modal-kiosk-location" placeholder="Ubicacion" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
-                                <input type="text" id="modal-kiosk-device-id" placeholder="ID de Dispositivo" required style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
-                                <select id="modal-kiosk-active" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
+                        <div class="modal-content kiosk-modal-content">
+                            <div class="modal-header">
+                                <h2>Nueva Kiosko</h2>
+                                <span class="close" id="close-kiosk-modal">&times;</span>
+                            </div>
+                            <form id="kiosk-modal-form" class="modal-form">
+                                <label for="modal-kiosk-name">Nombre</label>
+                                <input type="text" id="modal-kiosk-name" placeholder="Nombre" required>
+
+                                <label for="modal-kiosk-location">Ubicación</label>
+                                <input type="text" id="modal-kiosk-location" placeholder="Ubicación">
+
+                                <label for="modal-kiosk-device-id">ID de Dispositivo</label>
+                                <input type="text" id="modal-kiosk-device-id" placeholder="ID de Dispositivo" required>
+
+                                <label for="modal-kiosk-active">Estado</label>
+                                <select id="modal-kiosk-active">
                                     <option value="true">Activo</option>
                                     <option value="false">Inactivo</option>
                                 </select>
-                                <button type="submit" class="btn btn-primary" style="width:100%;">Agregar Kiosko</button>
+
+                                <button type="submit" class="btn btn-primary modal-btn">Agregar Kiosko</button>
                             </form>
                         </div>
                     </div>

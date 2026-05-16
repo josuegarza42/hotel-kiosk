@@ -1,19 +1,37 @@
-// Simple inline kiosko add form
+// Kiosko modal logic
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('kiosk-inline-form');
-    if (form) {
+    const openBtn = document.getElementById('open-kiosk-modal');
+    const modal = document.getElementById('kiosk-modal');
+    const closeBtn = document.getElementById('close-kiosk-modal');
+    const form = document.getElementById('kiosk-modal-form');
+
+    if (openBtn && modal && closeBtn && form) {
+        openBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            form.reset();
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                form.reset();
+            }
+        });
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = {
                 hotel_id: currentHotelId || 1,
-                name: document.getElementById('kiosk-name').value,
-                location: document.getElementById('kiosk-location').value,
-                device_id: document.getElementById('kiosk-device-id').value,
-                is_active: document.getElementById('kiosk-active').value === 'true'
+                name: document.getElementById('modal-kiosk-name').value,
+                location: document.getElementById('modal-kiosk-location').value,
+                device_id: document.getElementById('modal-kiosk-device-id').value,
+                is_active: document.getElementById('modal-kiosk-active').value === 'true'
             };
             try {
                 await adminApi.createKiosk(data);
                 form.reset();
+                modal.style.display = 'none';
                 loadKiosks();
             } catch (err) {
                 alert(err.message);

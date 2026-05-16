@@ -185,18 +185,27 @@
                 <section id="kiosks-section" class="content-section">
                     <div class="section-header">
                         <h3>Kioscos</h3>
+                        <button class="btn btn-primary" id="open-kiosk-modal">+ Nuevo Kiosko</button>
                     </div>
-                    <form id="kiosk-inline-form" style="display:flex;gap:10px;align-items:center;margin-bottom:24px;">
-                        <input type="text" id="kiosk-name" placeholder="Nombre" required style="padding:8px;border-radius:6px;border:1px solid #ccc;">
-                        <input type="text" id="kiosk-location" placeholder="Ubicacion" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
-                        <input type="text" id="kiosk-device-id" placeholder="ID de Dispositivo" required style="padding:8px;border-radius:6px;border:1px solid #ccc;">
-                        <select id="kiosk-active" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary">Agregar Kiosko</button>
-                    </form>
                     <div class="kiosks-grid" id="kiosks-grid"></div>
+
+                    <!-- Kiosko Modal -->
+                    <div id="kiosk-modal" class="modal" style="display:none;">
+                        <div class="modal-content" style="max-width:400px;">
+                            <span class="close" id="close-kiosk-modal">&times;</span>
+                            <h3>Nuevo Kiosko</h3>
+                            <form id="kiosk-modal-form">
+                                <input type="text" id="modal-kiosk-name" placeholder="Nombre" required style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
+                                <input type="text" id="modal-kiosk-location" placeholder="Ubicacion" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
+                                <input type="text" id="modal-kiosk-device-id" placeholder="ID de Dispositivo" required style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
+                                <select id="modal-kiosk-active" style="padding:8px;border-radius:6px;border:1px solid #ccc;width:100%;margin-bottom:10px;">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="width:100%;">Agregar Kiosko</button>
+                            </form>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Hotels Section (Super Admin) -->

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Kiosk - Check-in Automatizado</title>
+    <link rel="stylesheet" href="../src/styles/kiosk.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Pantalla de Bienvenida -->
+        <div id="welcome-screen" class="screen active">
+            <div class="logo">
+                <h1>Bienvenido</h1>
+                <p>Sistema de Check-in Automatizado</p>
+            </div>
+            <div class="welcome-content">
+                <div class="qr-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </div>
+                <h2>Escanea tu codigo QR</h2>
+                <p>Presenta el codigo QR de tu reservacion frente a la camara</p>
+                <button class="btn btn-primary btn-large" onclick="showScreen('scan-screen')">
+                    Iniciar Check-in
+                </button>
+                <button class="btn btn-secondary" onclick="showScreen('manual-screen')">
+                    Ingresar codigo manualmente
+                </button>
+            </div>
+            <div class="language-selector">
+                <button class="lang-btn active">ES</button>
+                <button class="lang-btn">EN</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Escaneo QR -->
+        <div id="scan-screen" class="screen">
+            <div class="header">
+                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
+                <h2>Escanear QR</h2>
+            </div>
+            <div class="scan-content">
+                <div id="qr-reader"></div>
+                <p>Coloca el codigo QR frente a la camara</p>
+                <div id="scan-status" class="status"></div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Ingreso Manual -->
+        <div id="manual-screen" class="screen">
+            <div class="header">
+                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
+                <h2>Ingreso Manual</h2>
+            </div>
+            <div class="manual-content">
+                <div class="form-group">
+                    <label for="confirmation-code">Codigo de Confirmacion</label>
+                    <input type="text" id="confirmation-code" placeholder="RES-XXXXXXXX" class="input-large">
+                </div>
+                <button class="btn btn-primary btn-large" onclick="searchByCode()">
+                    Buscar Reservacion
+                </button>
+                <div id="manual-status" class="status"></div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Confirmacion de Datos -->
+        <div id="confirm-screen" class="screen">
+            <div class="header">
+                <button class="btn-back" onclick="showScreen('welcome-screen')">← Volver</button>
+                <h2>Confirmar Datos</h2>
+            </div>
+            <div class="confirm-content">
+                <div class="reservation-card">
+                    <div class="guest-info">
+                        <h3 id="guest-name">-</h3>
+                        <p id="confirmation-display">Codigo: -</p>
+                    </div>
+                    <div class="reservation-details">
+                        <div class="detail-item">
+                            <span class="label">Hotel</span>
+                            <span id="hotel-name" class="value">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Habitacion</span>
+                            <span id="room-number" class="value">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Check-in</span>
+                            <span id="check-in-date" class="value">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Check-out</span>
+                            <span id="check-out-date" class="value">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="terms-section">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="terms-checkbox">
+                        <span class="checkmark"></span>
+                        Acepto los terminos y condiciones del hotel
+                    </label>
+                </div>
+                <button class="btn btn-primary btn-large" onclick="processCheckIn()" id="checkin-btn" disabled>
+                    Confirmar Check-in
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Exito -->
+        <div id="success-screen" class="screen">
+            <div class="success-content">
+                <div class="success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <h2>Check-in Exitoso</h2>
+                <div class="key-info">
+                    <p>Tu llave digital:</p>
+                    <div class="key-code" id="digital-key">-</div>
+                </div>
+                <div class="room-info-large">
+                    <p>Habitacion</p>
+                    <div class="room-number-large" id="assigned-room">-</div>
+                </div>
+                <div class="wristband-info">
+                    <p>Codigo de pulsera:</p>
+                    <div class="wristband-code" id="wristband-code">-</div>
+                </div>
+                <p class="instructions">Presenta este codigo en la entrada de tu habitacion</p>
+                <button class="btn btn-primary btn-large" onclick="finishAndReset()">
+                    Finalizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Error -->
+        <div id="error-screen" class="screen">
+            <div class="error-content">
+                <div class="error-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#f44336" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <h2>Error</h2>
+                <p id="error-message">Ha ocurrido un error</p>
+                <button class="btn btn-primary btn-large" onclick="showScreen('welcome-screen')">
+                    Intentar de nuevo
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="overlay hidden">
+            <div class="loader"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="../src/services/api.js"></script>
+    <script src="../src/components/kiosk.js"></script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Kiosk - Panel de Administracion</title>
+    <link rel="stylesheet" href="../src/styles/admin.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <h1>Hotel Kiosk</h1>
+                <p>Panel de Administracion</p>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="admin@hotel.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contrasena</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesion</button>
+                    <div id="login-error" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard-screen" class="screen">
+            <nav class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Hotel Kiosk</h2>
+                    <span id="user-role" class="role-badge">Admin</span>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-section="overview">
+                        <span class="nav-icon">📊</span> Dashboard
+                    </li>
+                    <li class="nav-item" data-section="reservations">
+                        <span class="nav-icon">📅</span> Reservaciones
+                    </li>
+                    <li class="nav-item" data-section="rooms">
+                        <span class="nav-icon">🛏️</span> Habitaciones
+                    </li>
+                    <li class="nav-item" data-section="guests">
+                        <span class="nav-icon">👥</span> Huespedes
+                    </li>
+                    <li class="nav-item" data-section="kiosks">
+                        <span class="nav-icon">🖥️</span> Kioscos
+                    </li>
+                    <li class="nav-item super-admin-only" data-section="hotels">
+                        <span class="nav-icon">🏨</span> Hoteles
+                    </li>
+                    <li class="nav-item super-admin-only" data-section="users">
+                        <span class="nav-icon">👤</span> Usuarios
+                    </li>
+                </ul>
+                <div class="sidebar-footer">
+                    <button class="btn btn-secondary" onclick="handleLogout()">Cerrar Sesion</button>
+                </div>
+            </nav>
+
+            <main class="main-content">
+                <header class="top-bar">
+                    <h1 id="section-title">Dashboard</h1>
+                    <div class="user-info">
+                        <span id="user-name">Usuario</span>
+                    </div>
+                </header>
+
+                <!-- Overview Section -->
+                <section id="overview-section" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="today-checkins">0</span>
+                                <span class="stat-label">Check-ins Hoy</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🛏️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="available-rooms">0</span>
+                                <span class="stat-label">Habitaciones Disponibles</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="current-guests">0</span>
+                                <span class="stat-label">Huespedes Actuales</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="occupancy-rate">0%</span>
+                                <span class="stat-label">Tasa de Ocupacion</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>Actividad Reciente</h3>
+                        <div id="activity-list" class="activity-list">
+                            <p class="empty-state">Cargando actividad...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reservations Section -->
+                <section id="reservations-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Reservaciones</h3>
+                        <button class="btn btn-primary" onclick="showModal('reservation-modal')">+ Nueva Reservacion</button>
+                    </div>
+                    <div class="filters">
+                        <select id="reservation-status-filter" onchange="filterReservations()">
+                            <option value="">Todos los estados</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="confirmed">Confirmada</option>
+                            <option value="checked_in">Check-in</option>
+                            <option value="checked_out">Check-out</option>
+                            <option value="cancelled">Cancelada</option>
+                        </select>
+                        <input type="date" id="reservation-date-filter" onchange="filterReservations()">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Huesped</th>
+                                    <th>Habitacion</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservations-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Rooms Section -->
+                <section id="rooms-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Habitaciones</h3>
+                        <button class="btn btn-primary" onclick="showModal('room-modal')">+ Nueva Habitacion</button>
+                    </div>
+                    <div class="rooms-grid" id="rooms-grid">
+                    </div>
+                </section>
+
+                <!-- Guests Section -->
+                <section id="guests-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Huespedes</h3>
+                        <button class="btn btn-primary" onclick="showModal('guest-modal')">+ Nuevo Huesped</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Telefono</th>
+                                    <th>Nacionalidad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guests-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Kiosks Section -->
+                <section id="kiosks-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Kioscos</h3>
+                        <button class="btn btn-primary" onclick="showModal('kiosk-modal')">+ Nuevo Kiosko</button>
+                    </div>
+                    <div class="kiosks-grid" id="kiosks-grid">
+                    </div>
+                </section>
+
+                <!-- Hotels Section (Super Admin) -->
+                <section id="hotels-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Hoteles</h3>
+                        <button class="btn btn-primary" onclick="showModal('hotel-modal')">+ Nuevo Hotel</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Ciudad</th>
+                                    <th>Telefono</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hotels-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Users Section (Super Admin) -->
+                <section id="users-section" class="content-section">
+                    <div class="section-header">
+                        <h3>Usuarios</h3>
+                        <button class="btn btn-primary" onclick="showModal('user-modal')">+ Nuevo Usuario</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Hotel</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Modals -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <!-- Reservation Modal -->
+            <div id="reservation-modal" class="modal hidden">
+                <div class="modal-header">
+                    <h3>Nueva Reservacion</h3>
+                    <button class="close-btn" onclick="hideModal()">&times;</button>
+                </div>
+                <form id="reservation-form" onsubmit="handleCreateReservation(event)">
+                    <div class="form-group">
+                        <label>Huesped</label>
+                        <select id="res-guest" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Habitacion</label>
+                        <select id="res-room" required></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Check-in</label>
+                            <input type="date" id="res-checkin" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Check-out</label>
+                            <input type="date" id="res-checkout" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Numero de Huespedes</label>
+                        <input type="number" id="res-guests" value="1" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Peticiones Especiales</label>
+                        <textarea id="res-requests"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Reservacion</button>
+                </form>
+            </div>
+
+            <!-- Guest Modal -->
+            <div id="guest-modal" class="modal hidden">
+                <div class="modal-header">
+                    <h3>Nuevo Huesped</h3>
+                    <button class="close-btn" onclick="hideModal()">&times;</button>
+                </div>
+                <form id="guest-form" onsubmit="handleCreateGuest(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="guest-firstname" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido</label>
+                            <input type="text" id="guest-lastname" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="guest-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefono</label>
+                        <input type="tel" id="guest-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Nacionalidad</label>
+                        <input type="text" id="guest-nationality">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Huesped</button>
+                </form>
+            </div>
+
+            <!-- Room Modal -->
+            <div id="room-modal" class="modal hidden">
+                <div class="modal-header">
+                    <h3>Nueva Habitacion</h3>
+                    <button class="close-btn" onclick="hideModal()">&times;</button>
+                </div>
+                <form id="room-form" onsubmit="handleCreateRoom(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Numero</label>
+                            <input type="text" id="room-number" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Piso</label>
+                            <input type="number" id="room-floor" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="room-type" required>
+                            <option value="single">Sencilla</option>
+                            <option value="double">Doble</option>
+                            <option value="suite">Suite</option>
+                            <option value="deluxe">Deluxe</option>
+                            <option value="presidential">Presidencial</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Precio por Noche</label>
+                            <input type="number" id="room-price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Max. Huespedes</label>
+                            <input type="number" id="room-max-guests" value="2" min="1" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Habitacion</button>
+                </form>
+            </div>
+
+            <!-- QR Modal -->
+            <div id="qr-modal" class="modal hidden">
+                <div class="modal-header">
+                    <h3>Codigo QR de Reservacion</h3>
+                    <button class="close-btn" onclick="hideModal()">&times;</button>
+                </div>
+                <div class="qr-content">
+                    <img id="qr-image" src="" alt="QR Code">
+                    <p id="qr-confirmation"></p>
+                    <button class="btn btn-primary" onclick="printQR()">Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../src/services/admin-api.js"></script>
+    <script src="../src/components/admin.js"></script>
+</body>
+</html>

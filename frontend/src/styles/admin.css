@@ -224,10 +224,12 @@ body {
 }
 
 /* Main Content */
+
 .main-content {
     margin-left: 260px;
     flex: 1;
     min-height: 100vh;
+    padding: 40px 40px 40px 40px;
 }
 
 .top-bar {
@@ -324,11 +326,14 @@ body {
 }
 
 /* Tables */
+
 .table-container {
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    padding: 20px 30px;
 }
 
 .data-table {
@@ -336,10 +341,15 @@ body {
     border-collapse: collapse;
 }
 
+
 .data-table th,
 .data-table td {
     padding: 15px 20px;
     text-align: left;
+}
+
+.data-table tbody tr:not(:last-child) {
+    border-bottom: 1.5px solid #e9ecef;
 }
 
 .data-table th {
@@ -379,15 +389,17 @@ body {
 .rooms-grid, .kiosks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 32px 24px;
 }
 
 .room-card, .kiosk-card {
     background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: 16px;
+    padding: 28px 20px 24px 20px;
+    box-shadow: 0 4px 18px 0 rgba(60,60,100,0.07), 0 1.5px 4px 0 rgba(60,60,100,0.04);
     text-align: center;
+    transition: box-shadow 0.2s;
+    margin-bottom: 8px;
 }
 
 .room-card .room-number {

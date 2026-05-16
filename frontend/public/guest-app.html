@@ -68,21 +68,38 @@
             font-size: 0.95rem;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 15px;
+        .code-input-wrapper {
+            display: flex;
+            align-items: center;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .code-input-wrapper:focus-within {
+            border-color: #4a90d9;
+        }
+
+        .code-input-wrapper .code-prefix {
+            padding: 15px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 15px;
+            border: none;
             font-size: 1.1rem;
             text-transform: uppercase;
-            text-align: center;
             letter-spacing: 2px;
-            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #4a90d9;
         }
 
         .form-group input::placeholder {
@@ -200,7 +217,10 @@
 
             <div class="form-group">
                 <label>Confirmation Code</label>
-                <input type="text" id="confirmation-code" placeholder="RES-XXXXXXXX" maxlength="12">
+                <div class="code-input-wrapper">
+                    <span class="code-prefix">RES-</span>
+                    <input type="text" id="confirmation-code" placeholder="XXXXXXXX" maxlength="8">
+                </div>
             </div>
 
             <button class="btn" id="link-btn" onclick="linkReservation()">
@@ -286,7 +306,8 @@
         }
 
         async function linkReservation() {
-            const code = document.getElementById('confirmation-code').value.trim().toUpperCase();
+            const codeInput = document.getElementById('confirmation-code').value.trim().toUpperCase();
+            const code = `RES-${codeInput}`;
             const manualSessionInput = document.getElementById('manual-session');
             const manualSession = manualSessionInput ? manualSessionInput.value.trim() : null;
 
@@ -297,7 +318,7 @@
                 return;
             }
 
-            if (!code) {
+            if (!codeInput) {
                 showStatus('Please enter your confirmation code', 'error');
                 return;
             }

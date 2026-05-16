@@ -1,13 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.core.config import settings
 from app.core.database import engine, Base, SessionLocal
 from app.api.v1.router import api_router
 from app.models import User, Hotel, Room, Guest, Reservation, CheckIn, Kiosk
 from app.models.user import UserRole
 from app.core.security import get_password_hash
+import os
 
 Base.metadata.create_all(bind=engine)
+
+FRONTEND_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -46,8 +51,13 @@ def create_initial_data():
         db.close()
 
 
-@app.get("/")
-def root():
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+
+@app.get("/api-info")
+def api_info():
     return {
         "message": "Hotel Kiosk API",
         "version": settings.VERSION,
@@ -55,6 +65,23 @@ def root():
     }
 
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
+# Serve frontend static files
+if os.path.exists(FRONTEND_PATH):
+    app.mount("/src", StaticFiles(directory=os.path.join(FRONTEND_PATH, "src")), name="src")
+    app.mount("/public", StaticFiles(directory=os.path.join(FRONTEND_PATH, "public")), name="public")
+
+    @app.get("/")
+    def serve_frontend():
+        return FileResponse(os.path.join(FRONTEND_PATH, "public", "index.html"))
+
+    @app.get("/guest-app")
+    def serve_guest_app():
+        return FileResponse(os.path.join(FRONTEND_PATH, "public", "guest-app.html"))
+else:
+    @app.get("/")
+    def root():
+        return {
+            "message": "Hotel Kiosk API",
+            "version": settings.VERSION,
+            "docs": f"{settings.API_V1_STR}/docs"
+        }

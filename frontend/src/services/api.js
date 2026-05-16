@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000/api/v1'
+    : 'https://adventurous-rebirth-production-57c1.up.railway.app/api/v1';
 
 const api = {
     async verifyQR(qrCode) {

@@ -185,10 +185,18 @@
                 <section id="kiosks-section" class="content-section">
                     <div class="section-header">
                         <h3>Kioscos</h3>
-                        <button class="btn btn-primary" onclick="showModal('kiosk-modal')">+ Nuevo Kiosko</button>
                     </div>
-                    <div class="kiosks-grid" id="kiosks-grid">
-                    </div>
+                    <form id="kiosk-inline-form" style="display:flex;gap:10px;align-items:center;margin-bottom:24px;">
+                        <input type="text" id="kiosk-name" placeholder="Nombre" required style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                        <input type="text" id="kiosk-location" placeholder="Ubicacion" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                        <input type="text" id="kiosk-device-id" placeholder="ID de Dispositivo" required style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                        <select id="kiosk-active" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Agregar Kiosko</button>
+                    </form>
+                    <div class="kiosks-grid" id="kiosks-grid"></div>
                 </section>
 
                 <!-- Hotels Section (Super Admin) -->

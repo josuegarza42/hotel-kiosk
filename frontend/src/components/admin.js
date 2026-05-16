@@ -1,3 +1,26 @@
+// Simple inline kiosko add form
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('kiosk-inline-form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                hotel_id: currentHotelId || 1,
+                name: document.getElementById('kiosk-name').value,
+                location: document.getElementById('kiosk-location').value,
+                device_id: document.getElementById('kiosk-device-id').value,
+                is_active: document.getElementById('kiosk-active').value === 'true'
+            };
+            try {
+                await adminApi.createKiosk(data);
+                form.reset();
+                loadKiosks();
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+    }
+});
 let currentUser = null;
 let currentHotelId = null;
 

@@ -58,6 +58,7 @@ python3 -m http.server 3000
 
 # 5. Abrir en navegador
 # Kiosko: http://localhost:3000/public/index.html
+# Guest App: http://localhost:3000/public/guest-app.html
 # API:    http://localhost:8000/docs
 ```
 
@@ -96,13 +97,14 @@ Hotel Kiosk automatiza el proceso completo:
 
 | Caracteristica | Descripcion |
 |----------------|-------------|
-| **Escaneo QR** | Camara integrada para escanear codigo QR de reservacion |
-| **Entrada Manual** | Teclado virtual para ingresar codigo de confirmacion |
+| **Check-in con QR** | El kiosko muestra QR que el huesped escanea con su celular |
+| **Guest App** | App web movil para vincular reservacion al kiosko |
+| **Entrada Manual** | Teclado virtual tactil o entrada por teclado fisico |
 | **Check-in Rapido** | Proceso completo en menos de 60 segundos |
-| **Check-out Sencillo** | Solo ingresa el numero de habitacion |
-| **Multi-idioma** | Soporte para Espanol, Ingles y Chino |
+| **Check-out Seguro** | Requiere habitacion + codigo de confirmacion |
+| **Multi-idioma** | Soporte para ES, EN, ZH, DE, PT, FR (6 idiomas) |
 | **Llave Digital** | Generacion automatica de codigo de acceso |
-| **Interfaz Tactil** | Disenada para pantallas touch de kiosko |
+| **Interfaz Tactil** | Disenada para pantallas touch, optimizada para moviles |
 
 ### Para Administradores de Hotel
 
@@ -272,6 +274,7 @@ python -m http.server 3000
 | Componente | URL |
 |------------|-----|
 | Kiosko | http://localhost:3000/public/index.html |
+| Guest App (movil) | http://localhost:3000/public/guest-app.html |
 | API Docs | http://localhost:8000/docs |
 | API ReDoc | http://localhost:8000/redoc |
 
@@ -318,38 +321,55 @@ const API_BASE_URL = 'http://tu-servidor:8000/api/v1';
 
 ## Uso
 
-### Flujo de Check-in
+### Flujo de Check-in (Opcion 1: QR del Kiosko)
 
 ```
-1. Huesped llega al kiosko
+1. Huesped llega al kiosko y selecciona "Iniciar Check-in"
          │
          ▼
-2. Selecciona "Escanear QR" o "Ingresar Codigo"
-         │
-         ├──► Escanea QR con camara
-         │           │
-         │           ▼
-         │    Sistema valida reservacion
-         │           │
-         └──► Ingresa codigo manual (RES-XXXXXX)
-                     │
-                     ▼
-3. Sistema muestra datos de reservacion
+2. Kiosko muestra codigo QR con ID de sesion
          │
          ▼
-4. Huesped confirma datos y acepta terminos
+3. Huesped escanea QR con su celular
          │
          ▼
-5. Sistema procesa check-in
+4. Se abre Guest App en el celular del huesped
          │
          ▼
-6. Huesped recibe:
+5. Huesped ingresa su codigo de confirmacion (RES-XXXXXXXX)
+         │
+         ▼
+6. Kiosko detecta automaticamente la reservacion vinculada
+         │
+         ▼
+7. Huesped confirma datos y acepta terminos en el kiosko
+         │
+         ▼
+8. Huesped recibe:
    - Numero de habitacion
    - Llave digital (codigo)
-   - Codigo de pulsera (opcional)
+   - Codigo de pulsera
+```
+
+### Flujo de Check-in (Opcion 2: Codigo Manual)
+
+```
+1. Huesped selecciona "Ingresar codigo manualmente"
          │
          ▼
-7. Pantalla se reinicia automaticamente (30s)
+2. Elige modo de entrada: Touch (teclado virtual) o Keyboard (teclado fisico)
+         │
+         ▼
+3. Ingresa codigo de confirmacion (solo 8 caracteres, RES- es automatico)
+         │
+         ▼
+4. Sistema valida y muestra datos de reservacion
+         │
+         ▼
+5. Huesped confirma y acepta terminos
+         │
+         ▼
+6. Recibe habitacion y llaves digitales
 ```
 
 ### Flujo de Check-out
@@ -358,25 +378,27 @@ const API_BASE_URL = 'http://tu-servidor:8000/api/v1';
 1. Huesped selecciona "Check-out"
          │
          ▼
-2. Ingresa numero de habitacion
+2. Ingresa numero de habitacion Y codigo de confirmacion
+   (verificacion de seguridad para evitar checkouts no autorizados)
          │
          ▼
-3. Sistema muestra resumen de estancia:
-   - Fechas de entrada/salida
+3. Sistema valida que el codigo coincida con la habitacion
+         │
+         ▼
+4. Sistema muestra resumen de estancia:
+   - Nombre del huesped
+   - Fechas de llegada/salida
    - Noches hospedado
-   - Cargos pendientes (si hay)
+   - Total a pagar
          │
          ▼
-4. Huesped confirma check-out
+5. Huesped confirma check-out
          │
          ▼
-5. Sistema procesa salida
+6. Pantalla de exito con opcion de calificar experiencia
          │
          ▼
-6. Mensaje de despedida
-         │
-         ▼
-7. Pantalla se reinicia automaticamente (30s)
+7. Pantalla se reinicia automaticamente
 ```
 
 ### Credenciales por Defecto
@@ -690,9 +712,14 @@ El sistema soporta multiples idiomas mediante un sistema de traducciones en el f
 
 | Codigo | Idioma | Completado |
 |--------|--------|------------|
-| `es` | Espanol | 100% |
 | `en` | English | 100% |
+| `es` | Espanol | 100% |
 | `zh` | 中文 (Chino) | 100% |
+| `de` | Deutsch (Aleman) | 100% |
+| `pt` | Portugues | 100% |
+| `fr` | Francais | 100% |
+
+La pantalla de bienvenida incluye una animacion que itera entre "Welcome", "Bienvenido", "欢迎", "Willkommen", "Bem-vindo" y "Bienvenue".
 
 ### Agregar un Nuevo Idioma
 

@@ -56,8 +56,12 @@ const api = {
         return response.json();
     },
 
-    async getActiveReservationByRoom(roomNumber) {
-        const response = await fetch(`${API_BASE_URL}/reservations/room/${roomNumber}/active`);
+    async getActiveReservationByRoom(roomNumber, confirmationCode = null) {
+        let url = `${API_BASE_URL}/reservations/room/${roomNumber}/active`;
+        if (confirmationCode) {
+            url += `?confirmation_code=${encodeURIComponent(confirmationCode)}`;
+        }
+        const response = await fetch(url);
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.detail || 'Habitacion no encontrada o sin huesped');

@@ -120,6 +120,7 @@ def get_reservation_by_code(
 @router.get("/room/{room_number}/active")
 def get_active_reservation_by_room(
     room_number: str,
+    confirmation_code: str = None,
     db: Session = Depends(get_db)
 ):
     """Get the active (checked-in) reservation for a room number - used for checkout"""
@@ -134,6 +135,10 @@ def get_active_reservation_by_room(
 
     if not reservation:
         raise HTTPException(status_code=404, detail="No hay huésped registrado en esta habitación")
+
+    if confirmation_code:
+        if reservation.confirmation_code != confirmation_code:
+            raise HTTPException(status_code=403, detail="El código de confirmación no coincide con esta habitación")
 
     guest = reservation.guest
     nights = (reservation.check_out_date - reservation.check_in_date).days

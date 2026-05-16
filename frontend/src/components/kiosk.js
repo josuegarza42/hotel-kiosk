@@ -435,14 +435,97 @@ function startSessionPolling() {
     }, 2000);
 }
 
-async function searchByCode() {
-    const code = document.getElementById('confirmation-code').value.trim().toUpperCase();
+// ==========================================
+// VIRTUAL KEYBOARD & INPUT MODE
+// ==========================================
 
-    if (!code) {
-        document.getElementById('manual-status').textContent = 'Ingresa un codigo de confirmacion';
+let inputMode = 'touch'; // 'touch' or 'keyboard'
+
+function setInputMode(mode) {
+    inputMode = mode;
+
+    // Update toggle buttons
+    document.getElementById('mode-touch').classList.toggle('active', mode === 'touch');
+    document.getElementById('mode-keyboard').classList.toggle('active', mode === 'keyboard');
+
+    // Show/hide appropriate inputs
+    document.getElementById('touch-display').style.display = mode === 'touch' ? 'flex' : 'none';
+    document.querySelector('.virtual-keyboard').style.display = mode === 'touch' ? 'flex' : 'none';
+    document.getElementById('keyboard-input-wrapper').style.display = mode === 'keyboard' ? 'flex' : 'none';
+
+    // Sync values between inputs
+    if (mode === 'keyboard') {
+        document.getElementById('keyboard-input').value = document.getElementById('confirmation-code').value;
+        document.getElementById('keyboard-input').focus();
+    } else {
+        document.getElementById('confirmation-code').value = document.getElementById('keyboard-input').value.toUpperCase();
+        updateCodeDisplay();
+    }
+}
+
+function setupKeyboardInput() {
+    const keyboardInput = document.getElementById('keyboard-input');
+    if (keyboardInput) {
+        keyboardInput.addEventListener('input', (e) => {
+            const value = e.target.value.toUpperCase().replace(/[^A-F0-9]/g, '');
+            e.target.value = value;
+            document.getElementById('confirmation-code').value = value;
+        });
+    }
+}
+
+function pressKey(key) {
+    const input = document.getElementById('confirmation-code');
+
+    if (input.value.length < 8) {
+        input.value += key;
+        updateCodeDisplay();
+    }
+}
+
+function deleteKey() {
+    const input = document.getElementById('confirmation-code');
+    input.value = input.value.slice(0, -1);
+    updateCodeDisplay();
+    clearStatus();
+}
+
+function clearCode() {
+    document.getElementById('confirmation-code').value = '';
+    document.getElementById('keyboard-input').value = '';
+    updateCodeDisplay();
+    clearStatus();
+}
+
+function updateCodeDisplay() {
+    const input = document.getElementById('confirmation-code');
+    const display = document.getElementById('code-display');
+    const value = input.value;
+
+    // Mostrar el valor con underscores para los espacios vacios
+    let displayText = value.padEnd(8, '_').split('').join('');
+    display.textContent = displayText;
+}
+
+function clearStatus() {
+    const status = document.getElementById('manual-status');
+    if (status) {
+        status.textContent = '';
+        status.className = 'status';
+    }
+}
+
+async function searchByCode() {
+    const codeInput = document.getElementById('confirmation-code').value.trim().toUpperCase();
+
+    if (!codeInput || codeInput.length < 4) {
+        document.getElementById('manual-status').textContent = 'Ingresa al menos 4 caracteres';
         document.getElementById('manual-status').className = 'status error';
         return;
     }
+
+    // Agregar prefijo RES- si no lo tiene
+    const code = codeInput.startsWith('RES-') ? codeInput : `RES-${codeInput}`;
 
     showLoading();
 
@@ -540,8 +623,14 @@ function finishAndReset() {
     document.getElementById('scan-status').textContent = '';
     document.getElementById('scan-status').className = 'status';
 
+    // Reset code display
+    const codeDisplay = document.getElementById('code-display');
+    if (codeDisplay) codeDisplay.textContent = '________';
+
     const roomInput = document.getElementById('room-input');
     if (roomInput) roomInput.value = '';
+    const checkoutCodeInput = document.getElementById('checkout-code-input');
+    if (checkoutCodeInput) checkoutCodeInput.value = '';
     const checkoutStatus = document.getElementById('checkout-status');
     if (checkoutStatus) {
         checkoutStatus.textContent = '';
@@ -557,17 +646,26 @@ function finishAndReset() {
 
 async function searchRoomForCheckout() {
     const roomNumber = document.getElementById('room-input').value.trim();
+    const codeInput = document.getElementById('checkout-code-input').value.trim().toUpperCase();
 
     if (!roomNumber) {
-        document.getElementById('checkout-status').textContent = 'Ingresa el numero de habitacion';
+        document.getElementById('checkout-status').textContent = 'Ingresa el número de habitación';
         document.getElementById('checkout-status').className = 'status error';
         return;
     }
 
+    if (!codeInput) {
+        document.getElementById('checkout-status').textContent = 'Ingresa el código de confirmación';
+        document.getElementById('checkout-status').className = 'status error';
+        return;
+    }
+
+    const confirmationCode = `RES-${codeInput}`;
+
     showLoading();
 
     try {
-        const data = await api.getActiveReservationByRoom(roomNumber);
+        const data = await api.getActiveReservationByRoom(roomNumber, confirmationCode);
         currentCheckoutData = data;
 
         document.getElementById('checkout-guest-name').textContent = data.guest_name;
@@ -607,6 +705,7 @@ async function processCheckout() {
 document.addEventListener('DOMContentLoaded', () => {
     setupLanguageSelector();
     applyTranslations();
+    setupKeyboardInput();
     showScreen('welcome-screen');
     startWelcomeAnimation();
 });

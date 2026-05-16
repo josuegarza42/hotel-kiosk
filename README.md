@@ -32,11 +32,25 @@
 
 ---
 
+## Demo en Vivo
+
+🚀 **Aplicacion desplegada en Railway:**
+
+| Componente | URL |
+|------------|-----|
+| **Kiosko** | https://hearty-dream-production.up.railway.app/ |
+| **Guest App** | https://hearty-dream-production.up.railway.app/guest-app |
+| **API Docs** | https://hearty-dream-production.up.railway.app/docs |
+
+---
+
 ## Inicio Rapido (Quick Start)
+
+### Desarrollo Local
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/hotel-kiosk.git
+git clone https://github.com/josuegarza42/hotel-kiosk.git
 cd hotel-kiosk
 
 # 2. Ejecutar script de instalacion
@@ -791,25 +805,54 @@ pytest tests/test_reservations.py -v
 
 ## Deployment
 
-### Docker (Recomendado)
+### Railway (Produccion Actual)
+
+El proyecto esta desplegado en Railway con un solo servicio que sirve backend + frontend:
+
+**URL de produccion:** https://hearty-dream-production.up.railway.app/
+
+```bash
+# Instalar Railway CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# Crear proyecto
+railway init
+
+# Agregar PostgreSQL
+railway add --database postgres
+
+# Configurar variables
+railway variables --set "DATABASE_URL=\${{Postgres.DATABASE_URL}}"
+railway variables --set "SECRET_KEY=tu-clave-secreta"
+
+# Desplegar
+railway up
+```
+
+El backend sirve automaticamente los archivos estaticos del frontend desde `/frontend`.
+
+### Docker (Alternativa)
 
 ```dockerfile
 # Dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ .
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY . .
+CMD ["sh", "-c", "cd backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 ```
 
 ```yaml
 # docker-compose.yml
 version: '3.8'
 services:
-  backend:
+  app:
     build: .
     ports:
       - "8000:8000"
@@ -826,13 +869,6 @@ services:
       - POSTGRES_DB=hotel
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  frontend:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html
 
 volumes:
   pgdata:
